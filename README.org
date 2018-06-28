@@ -1,0 +1,16 @@
+* UiAutomatorIME
+fork自[[https://github.com/lovexiaov/android_pinyin_ime][android_pinyin_ime]]
+
+* 用法
+  使用复制黏贴的方式来输入文本
+#+BEGIN_SRC java
+ClipboardManager clipboard = (ClipboardManager) App.instance().getSystemService(Context.CLIPBOARD_SERVICE);
+ClipData clip = ClipData.newPlainText("label", text);
+clipboard.setPrimaryClip(clip);
+UiDeviceEx.instance().pressKeyCode(KeyEvent.KEYCODE_V, KeyEvent.META_CTRL_ON);
+#+END_SRC
+
+  使用pressSearch的方式触发搜索
+#+BEGIN_SRC java
+uidevice.pressSearch()
+#+END_SRC
