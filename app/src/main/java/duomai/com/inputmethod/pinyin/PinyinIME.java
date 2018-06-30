@@ -71,7 +71,7 @@ public class PinyinIME extends InputMethodService {
   /**
    * TAG for debug.
    */
-  static final String TAG = "PinyinIME";
+  static final String TAG = "tonghu";
 
   /**
    * If is is true, IME will simulate key events for delete key, and send the
@@ -244,7 +244,27 @@ public class PinyinIME extends InputMethodService {
 
   @Override
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    return handleUiAutomator(keyCode, event) || processKey(event, 0 != event.getRepeatCount()) || super.onKeyDown(keyCode, event);
+//      Log.i(TAG, "event: " + event);
+    if (isUiAutomatorKey(keyCode, event)) {
+      return handleUiAutomator(keyCode, event);
+    } else {
+      return processKey(event, 0 != event.getRepeatCount()) || super.onKeyDown(keyCode, event);
+    }
+  }
+
+  @Override
+  public boolean onKeyUp(int keyCode, KeyEvent event) {
+//      Log.i(TAG, "event: " + event);
+    if (isUiAutomatorKey(keyCode, event)) {
+      return handleUiAutomator(keyCode, event);
+    } else {
+      return processKey(event, true) || super.onKeyUp(keyCode, event);
+    }
+  }
+
+
+  private boolean isUiAutomatorKey(int keyCode, KeyEvent event) {
+      return keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_V;
   }
 
   /**
@@ -254,32 +274,44 @@ public class PinyinIME extends InputMethodService {
     InputConnection ic = getCurrentInputConnection();
     switch (keyCode) {
         case KeyEvent.KEYCODE_SEARCH:
-            ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
-            return true;
+            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
+//                commitResultText("vvvla");
+            }
+//            commitResultText("search");
+//            commitResultText("ctrl+v");
+
+          return true;
         case KeyEvent.KEYCODE_V:
+            Log.i(TAG, "event: " + event);
             int metaState = event.getMetaState();
             if ((metaState & KeyEvent.META_CTRL_ON) != 0) {
-                // 黏贴
-                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                if (clipboard != null) {
-                    ClipData primaryClip = clipboard.getPrimaryClip();
-                    ClipData.Item itemAt = primaryClip.getItemAt(0);
-                    CharSequence text = itemAt.getText();
-                    Log.i("tonghu", "paste text: " + text);
-                    ic.commitText(text, 1);
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    return false;
+                } else {
+                    String text = "硬编码测试文字111";
+                      Log.i("tonghu", "commit text: " + text);
+                    commitResultText("vvvla");
                 }
+                return false;
             }
-            return true;
-
+//            if (event.getAction() == KeyEvent.ACTION_UP) {
+//                // 黏贴
+////                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
+////                if (clipboard != null) {
+////                  ClipData primaryClip = clipboard.getPrimaryClip();
+////                  ClipData.Item itemAt = primaryClip.getItemAt(0);
+////                  CharSequence text = itemAt.getText();
+////                  Log.i("tonghu", "paste text: " + text);
+////                }
+////                  commitResultText(text);
+//                  // try clear
+////                  getCurrentInputConnection().clearMetaKeyStates(KeyEvent.META_CTRL_ON);
+////                  commitResultText("ctrl+v");
+//              }
+//            return true;
     }
     return false;
-  }
-
-
-  @Override
-  public boolean onKeyUp(int keyCode, KeyEvent event) {
-    if (processKey(event, true)) return true;
-    return super.onKeyUp(keyCode, event);
   }
 
   private boolean processKey(KeyEvent event, boolean realAction) {
@@ -795,6 +827,7 @@ public class PinyinIME extends InputMethodService {
   }
 
   private void commitResultText(String resultText) {
+      Log.i(TAG, "commitResultText: " + resultText);
     InputConnection ic = getCurrentInputConnection();
     if (null != ic) ic.commitText(resultText, 1);
     if (null != mComposingView) {
