@@ -276,40 +276,19 @@ public class PinyinIME extends InputMethodService {
         case KeyEvent.KEYCODE_SEARCH:
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
-//                commitResultText("vvvla");
             }
-//            commitResultText("search");
-//            commitResultText("ctrl+v");
-
-          return true;
+            return true;
         case KeyEvent.KEYCODE_V:
-            Log.i(TAG, "event: " + event);
+//            Log.i(TAG, "event: " + event);
             int metaState = event.getMetaState();
             if ((metaState & KeyEvent.META_CTRL_ON) != 0) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    return false;
+                    ic.performContextMenuAction(android.R.id.paste);
                 } else {
-                    String text = "硬编码测试文字111";
-                      Log.i("tonghu", "commit text: " + text);
-                    commitResultText("vvvla");
+                    // do nothing
                 }
-                return false;
             }
-//            if (event.getAction() == KeyEvent.ACTION_UP) {
-//                // 黏贴
-////                ClipboardManager clipboard = (ClipboardManager) getApplicationContext().getSystemService(Context.CLIPBOARD_SERVICE);
-////                if (clipboard != null) {
-////                  ClipData primaryClip = clipboard.getPrimaryClip();
-////                  ClipData.Item itemAt = primaryClip.getItemAt(0);
-////                  CharSequence text = itemAt.getText();
-////                  Log.i("tonghu", "paste text: " + text);
-////                }
-////                  commitResultText(text);
-//                  // try clear
-////                  getCurrentInputConnection().clearMetaKeyStates(KeyEvent.META_CTRL_ON);
-////                  commitResultText("ctrl+v");
-//              }
-//            return true;
+            return true;
     }
     return false;
   }
